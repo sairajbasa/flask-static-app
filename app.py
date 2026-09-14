@@ -5,6 +5,7 @@ to generate chaos: roasts, fortunes, weird facts, screen-shake triggers,
 and randomly-colored backgrounds. Nothing is persisted. Nothing is serious.
 """
 
+
 import random
 from datetime import datetime
 from flask import Flask, render_template, jsonify
