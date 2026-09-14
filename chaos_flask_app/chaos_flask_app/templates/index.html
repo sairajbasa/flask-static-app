@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🌀 The Chaos Machine</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <div class="emoji-rain" id="emojiRain"></div>
+
+  <main class="card" id="card">
+    <h1 id="title">🌀 THE CHAOS MACHINE 🌀</h1>
+    <p class="subtitle">Press the button. Accept the consequences.</p>
+
+    <button id="chaosBtn" class="chaos-btn">UNLEASH CHAOS</button>
+
+    <section class="result" id="result" hidden>
+      <div class="result-block" id="roastBlock">
+        <span class="label">🔥 Roast</span>
+        <p id="roastText"></p>
+      </div>
+      <div class="result-block" id="fortuneBlock">
+        <span class="label">🔮 Fortune</span>
+        <p id="fortuneText"></p>
+      </div>
+      <div class="result-block" id="factBlock">
+        <span class="label">🧠 Random Fact</span>
+        <p id="factText"></p>
+      </div>
+      <p class="timestamp" id="timestamp"></p>
+    </section>
+  </main>
+
+  <script>
+    const btn = document.getElementById('chaosBtn');
+    const result = document.getElementById('result');
+    const card = document.getElementById('card');
+    const title = document.getElementById('title');
+    const emojiRain = document.getElementById('emojiRain');
+    const emojis = ['🌀','🔥','💥','🎉','👾','🤪','⚡','🌈','🫠','🎲'];
+
+    function spawnEmoji() {
+      const el = document.createElement('span');
+      el.className = 'falling-emoji';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (2 + Math.random() * 3) + 's';
+      el.style.fontSize = (16 + Math.random() * 24) + 'px';
+      emojiRain.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }
+
+    async function unleashChaos() {
+      btn.disabled = true;
+      btn.textContent = 'BREWING NONSENSE...';
+
+      const res = await fetch('/api/chaos');
+      const data = await res.json();
+
+      // Randomize page background + accent colors
+      document.body.style.background =
+        `linear-gradient(135deg, ${data.bg_color}, ${data.accent_color})`;
+      card.style.borderColor = data.accent_color;
+      card.style.transform = `rotate(${data.rotation}deg)`;
+
+      title.textContent = data.title;
+
+      document.getElementById('roastText').textContent = data.roast;
+      document.getElementById('fortuneText').textContent = data.fortune;
+      document.getElementById('factText').textContent = data.fact;
+      document.getElementById('timestamp').textContent =
+        'Generated at ' + data.timestamp;
+
+      result.hidden = false;
+
+      // Emoji rain burst
+      for (let i = 0; i < 25; i++) {
+        setTimeout(spawnEmoji, i * 40);
+      }
+
+      // Optional screen shake
+      if (data.shake) {
+        document.body.classList.add('shake');
+        setTimeout(() => document.body.classList.remove('shake'), 500);
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'UNLEASH CHAOS AGAIN';
+    }
+
+    btn.addEventListener('click', unleashChaos);
+  </script>
+</body>
+</html>
